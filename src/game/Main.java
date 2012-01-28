@@ -1,8 +1,8 @@
 /* Quick game
-*
-* @author lanxu <jukka.lankinen@gmail.com>
-* @version 1.0
-*/
+ *
+ * @author lanxu <jukka.lankinen@gmail.com>
+ * @version 1.0
+ */
 
 package game;
 
@@ -26,17 +26,17 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Main {
 	private static final int FRAMERATE = 60;
-	
+
 	public static Physics physics_;
 	public static Input input_;
 	public static Graphics graphics_;
-	
+
 	private static boolean finished_;
 	private static Texture characters_;
 	private static Texture tiles_;
 	private static boolean flip_;
 	private static int tile = 1;
-	
+
 	private static int frame_ = 0;
 	private static Level level_;
 	private static float gravity_ = 10.0f;
@@ -45,8 +45,8 @@ public class Main {
 	private static int mouseStartX = 0;
 	private static int mouseStartY = 0;
 	private static float mouseStartAngle = 0;
-	
-	
+
+
 	public static void main(String[] args) {
 		try {
 			// Init the game
@@ -58,10 +58,10 @@ public class Main {
 		} finally {
 			// Free stuff
 			cleanup();
-			
+
 		}
 	}
-	
+
 	private static void init(boolean fullscreen) throws Exception {
 		// Create display
 		Display.setTitle("Liquid Panic");
@@ -69,48 +69,57 @@ public class Main {
 		Display.setVSyncEnabled(false);
 		Display.setDisplayMode(new DisplayMode(800, 600));
 		Display.create();
-		
+
 		// Create managers
 		graphics_ = new Graphics();
 		physics_ = new Physics(graphics_); // BROKEN
 		input_ = new Input();
-		
+
 		// Init managers
 		graphics_.init();
 		physics_.init();
 		level_ = new Level();
 	}
-	
+
 	private static void render() {
 		graphics_.renderEntities();
 		Display.update();
 	}
-	
+
 	private static float getAngle(float x, float y) {
-		float dx = Mouse.getX() - 400; // FIXME!!111111
-		float dy = Mouse.getY() - 300;
+		float dx = x - 400; // FIXME!!111111
+		float dy = y - 300;
 		float angle;
-		
-		if(dy >= 0) {
+
+		if(dy < 0) {
 			if(dx >= 0) {
 				angle = (float) Math.atan(dy/dx);
 			}
 			else {
-				angle = (float) ((3.14f / 2.0f) + Math.atan(-dx/dy));
+				angle = (float) ((-3.14f / 2.0f) - Math.atan(dx/dy));
 			}
 		}
 		else {
 			if(dx >= 0) {
-				angle = (float) (3.0f/4.0f*3.1415926535897932384626433832795028841f + Math.atan(-dy/dx));
+				angle = (float) ((-3.0f/2.0f)*3.1415926535897932384626433832795028841f - Math.atan(dx/dy));
 			}
 			else {
-				angle = (float) (-3.1415926535897932384626433832795028841f + Math.atan(-dy/dx));
+				angle = (float) (-3.1415926535897932384626433832795028841f - Math.atan(-dy/dx));
 			}
 		}
-		
+
 		return angle;
 	}
-	
+
+	private static float getAngleSlider(float x, float x_max) {
+		float dx = Mouse.getX() - x_max;
+		float angle;
+
+		angle = (dx / 400) * 2.0f * 3.14159f;
+
+		return angle;
+	}
+
 	private static void logic() {
 		physics_.update();
 		if(input_.isDown(Input.KEY_RIGHT)) {
@@ -119,8 +128,7 @@ public class Main {
 		if(input_.isDown(Input.KEY_LEFT)) {
 			rotation_++;
 		}        
-        //float dx = 400 - Mouse.getX();
-        //float dy = 300 - Mouse.getY();
+
 		Mouse.getEventButtonState();
 		
 		float z = Mouse.getDWheel();
@@ -128,64 +136,45 @@ public class Main {
 		if(z < 0) graphics_.globalScale_-=0.01f;
 		if(z > 0) graphics_.globalScale_+=0.01f;
 		
-        if (Mouse.isButtonDown(0)) {
-        	if(mouseDown_ == false) {
-            	
-        		mouseStartAngle = getAngle(Mouse.getX(), Mouse.getY());
-        		mouseDown_ = true;
-        	} else {
-            	float mouseEndAngle;
-            	mouseEndAngle = getAngle(Mouse.getX(), Mouse.getY());
-            	/*
-            	if(dx == 0) {
-            		//dx = 1;
-            		if(dy < 0) {
-            			mouseEndAngle = mouseStartAngle + 3.14f; 
-            		} else {
-            			mouseEndAngle = mouseStartAngle - 3.14f; 
-            		}
+		if (Mouse.isButtonDown(0)) {
+			if(mouseDown_ == false) {
 
-            	} else {
-            		mouseEndAngle = (float) Math.atan(dy / dx);
-            	}*/
-            	//if(mouseStartAngle <)
-            	//mouseEndAngle = (float) Math.atan(Math.abs(dy / dx));
-            	//if(mouseStartAngle < 0 && mouseEndAngle > 0) {
-            		//mouseEndAngle;
-            	//}
-            	/*if(dx < 0) {
-            		mouseEndAngle = (float) Math.atan(dy / dx);
-            	} else {
-            		mouseEndAngle = (float) Math.atan(dy / dx);
-            	}*/
-        		
-        		float drot = (float) ((mouseEndAngle - mouseStartAngle)*(180.0f/3.14f));
-        		System.out.println("Drot: "+drot);
-        		System.out.println("start: "+mouseStartAngle);
-        		System.out.println("stop : "+mouseEndAngle);
-        		
-        		//mouseDown_ = false;
-        		//rotation_ += drot;
-        		
-        	}
+				mouseStartAngle = getAngle(Mouse.getX(), Mouse.getY());
+				//mouseStartAngle = getAngleSlider(Mouse.getX(), 400);
+				mouseDown_ = true;
+			} else {
+				float mouseEndAngle;
+				mouseEndAngle = getAngle(Mouse.getX(), Mouse.getY());
+				//mouseEndAngle = getAngleSlider(Mouse.getX(), 400);
 
-        	//boolean leftButtonDown = Mouse.isButtonDown(0);
-        	//boolean rightButtonDown = Mouse.isButtonDown(1);
-        	
-        	
-        	
-        } else {
-        	mouseDown_ = false;
-        }
-        
-        Vec2 vector = new Vec2((float)(gravity_*Math.sin(-rotation_/(180/3.14f))), (float)(-gravity_*Math.cos(-rotation_/(180/3.14f))));        
-        physics_.world_.setGravity(vector);
-        graphics_.globalRot_ = rotation_;
-                
-        //rotation_ += 0.1f;
+				float drot = (float) ((mouseEndAngle - mouseStartAngle)*(180.0f/3.14f));
+				//System.out.println("Drot: "+drot);
+				//System.out.println("x: " + Mouse.getX());
+				//System.out.println("y: " + Mouse.getY());
+				//System.out.println("start: "+mouseStartAngle);
+				//System.out.println("stop : "+mouseEndAngle);
+
+				mouseDown_ = false;
+				rotation_ += drot;
+
+			}
+
+			//boolean leftButtonDown = Mouse.isButtonDown(0);
+			//boolean rightButtonDown = Mouse.isButtonDown(1);
+
+
+		} else {
+			mouseDown_ = false;
+		}
+
+		Vec2 vector = new Vec2((float)(gravity_*Math.sin(-rotation_/(180/3.14f))), (float)(-gravity_*Math.cos(-rotation_/(180/3.14f))));        
+		physics_.world_.setGravity(vector);
+		graphics_.globalRot_ = rotation_;
+
+		//rotation_ += 0.1f;
 
 	}
-	
+
 	private static void run() {
 		while(!finished_) {
 			if(Display.isCloseRequested()) {
@@ -207,7 +196,7 @@ public class Main {
 			frame_++;
 		} // while
 	}
-	
+
 	private static void cleanup() {
 		Display.destroy();
 		System.out.println("Cleanup");
