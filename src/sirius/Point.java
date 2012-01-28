@@ -19,7 +19,7 @@ public class Point {
 	public float getX() {
 		return x_;
 	}
-	public float geyY() {
+	public float getY() {
 		return y_;
 	}
 	public float getZ() {

@@ -25,9 +25,9 @@ import static org.lwjgl.opengl.GL11.*;
 public class Main {
 	private static final int FRAMERATE = 60;
 	
-	private static Physics physics_;
-	private static Input input_;
-	private static Graphics graphics_;
+	public static Physics physics_;
+	public static Input input_;
+	public static Graphics graphics_;
 	
 	private static boolean finished_;
 	private static Texture characters_;
@@ -36,7 +36,7 @@ public class Main {
 	private static int tile = 1;
 	
 	private static int frame_ = 0;
-	
+	private static Level level_;
 	
 	public static void main(String[] args) {
 		try {
@@ -63,27 +63,13 @@ public class Main {
 		
 		// Create managers
 		graphics_ = new Graphics();
-		physics_ = new Physics();
+		physics_ = new Physics(graphics_); // BROKEN
 		input_ = new Input();
 		
 		// Init managers
 		graphics_.init();
-/*
-		entity_ = new Entity();
-		entity_.setPosition(0.5f, 0.5f);
-		
-		GraphicsEntity gentity = new GraphicsEntity(entity_);
-		TextureLoader textureLoader = new TextureLoader();
-		Texture tex = textureLoader.getTexture("resources/graphics/game.png");
-		
-		gentity.addTexture(tex);
-		graphics_.addEntity(gentity);
-		
-		PhysicsEntity pentity = new PhysicsEntity(entity_);
-		pentity.setAsBox(0.3f, 0.3f);
-		physics_.addEntity(pentity);
 		physics_.init();
-*/
+		level_ = new Level();
 	}
 	
 	private static void render() {
@@ -93,6 +79,10 @@ public class Main {
 	
 	private static void logic() {
 		physics_.update();
+		if(input_.isDown(Input.KEY_LEFT)) {
+			//System.out.println("JKE");
+			//level_.objects_.get(0).getPhysicsEntity().setVelocity(1.0f, 0.0f);
+		}
 	}
 	
 	private static void run() {

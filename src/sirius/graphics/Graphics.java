@@ -12,6 +12,9 @@ import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.opengl.TextureImpl;
 import org.newdawn.slick.util.ResourceLoader;
 
+import sirius.Point;
+import sirius.Shape;
+
 public class Graphics {
 	// Graphics Manager goes through a pipeline which has several steps
 	// x. Define primitives (GraphicsEntities)
@@ -70,7 +73,7 @@ public class Graphics {
 				
 		// load font from a .ttf file
 		try {
-			InputStream inputStream	= ResourceLoader.getResourceAsStream("resources/graphics/Acme-Regular.ttf");
+			InputStream inputStream	= ResourceLoader.getResourceAsStream("resources/Fresca-Regular.ttf");
 			
 			Font awtFont2 = Font.createFont(Font.TRUETYPE_FONT, inputStream);
 			awtFont2 = awtFont2.deriveFont(32f); // set font size
@@ -115,24 +118,55 @@ public class Graphics {
 	    //glEnable(GL_DEPTH_TEST);
 		Enumeration<GraphicsEntity> e = entities_.elements();
 		while(e.hasMoreElements()) {
-			GraphicsEntity ge = e.nextElement();
+			GraphicsEntity gEntity = e.nextElement();
+		
+			Material m = gEntity.getMaterial();
 			
-			Texture tex = ge.getTexture();
+			if(m.isSolid()) {
+				TextureImpl.bindNone();
+				float r = m.getRed();
+				float g = m.getGreen();
+				float b = m.getBlue();
+				glColor3f(r,g,b);
 
-			//Quad quad(Point(), Point(), 
-			//          Point(), Point());
-			float x = ge.getEntity().getX();
+				Shape shape = gEntity.getPolygonShape();
+				if(shape.getShapeType() == Shape.POLYGON) {
+					float x = gEntity.getEntity().getX();
+					float y = gEntity.getEntity().getY();
+					float rot = gEntity.getEntity().getRotation();
+					
+					glPushMatrix();
+				    	glTranslatef(x, y, 0.0f);
+				    	glRotatef(rot, 0.0f, 0.0f, 1.0f);
+				    	
+				    	glBegin(GL_POLYGON);
+				    	Vector<Point> points = shape.getPoints();
+				    	Enumeration<Point> pEnum = points.elements();
+						while(pEnum.hasMoreElements()) {
+							Point point = pEnum.nextElement();
+										
+							glVertex2f(point.getX(), point.getY());
+							
+						}
+				    	glEnd();
+				    glPopMatrix();
+				}
+			} else if(m.isTextured()) {
+				Texture tex = gEntity.getTexture();
+				tex.bind();
+				
+			}
+			
+			/*float x = ge.getEntity().getX();
 			float y = ge.getEntity().getY();
 			
 			float sx = 0 / (float)tex.getImageWidth();
 		    float sy = 16 / (float)tex.getImageHeight();
 		    float tx = 16 / (float)tex.getImageWidth();
 		    float ty = 16 / (float)tex.getImageHeight();
-		 		    
-		    glPushMatrix();
+		 		*/    
 		    
-		    tex.bind();
-		    
+		    /*
 		    glTranslatef(x, y, 0.0f);
 		    glScalef(0.1f, 0.1f, 0.1f);
 		    glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
@@ -152,7 +186,7 @@ public class Graphics {
 		    glVertex2i(-1,  1); 
 		    glEnd();
 			
-		    glPopMatrix();
+		    glPopMatrix();*/
 		}
 		glPopMatrix();
 		frame_++;

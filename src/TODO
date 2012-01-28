@@ -1,0 +1,12 @@
+TODO
+====
+
+
+
+
+Minor:
+------
+- Physics and PhysicsEntity totally broken when considering the framework
+  * public world
+  * physics manager required for entity
+  * Shape not used

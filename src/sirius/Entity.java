@@ -5,6 +5,11 @@ public class Entity {
 	private float positionY_;
 	private float rotation_;
 	
+	public Entity() {
+		positionX_ = 0;
+		positionY_ = 0;
+		rotation_ = 0;
+	}
 	public float getX() {
 		return positionX_;
 	}
