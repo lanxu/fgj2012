@@ -104,7 +104,7 @@ public class Main {
 				angle = (float) (3.0f/4.0f*3.1415926535897932384626433832795028841f + Math.atan(-dy/dx));
 			}
 			else {
-				angle = (float) (3.1415926535897932384626433832795028841f + Math.atan(dy/dx));
+				angle = (float) (-3.1415926535897932384626433832795028841f + Math.atan(-dy/dx));
 			}
 		}
 		
@@ -121,7 +121,13 @@ public class Main {
 		}        
         //float dx = 400 - Mouse.getX();
         //float dy = 300 - Mouse.getY();
-        
+		Mouse.getEventButtonState();
+		
+		float z = Mouse.getDWheel();
+		//System.out.println("H "+z);
+		if(z < 0) graphics_.globalScale_-=0.01f;
+		if(z > 0) graphics_.globalScale_+=0.01f;
+		
         if (Mouse.isButtonDown(0)) {
         	if(mouseDown_ == false) {
             	

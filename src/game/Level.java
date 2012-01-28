@@ -150,7 +150,7 @@ public class Level {
 		//
 		{
 		Entity entity = new Entity();
-		entity.setPosition(0.0f, -15.0f);
+		entity.setPosition(0.0f, -10.0f);
 		entity.setRotation(0);
 		
 		GraphicsEntity gEntity = new GraphicsEntity(entity);

@@ -26,19 +26,19 @@ public class Physics {
 	private Vector<PhysicsEntity> entities_;
 
 	// Liquid Physics
-	private int nParticles = 1000;
+	private int nParticles = 500;
 	private float totalMass = 10.0f;
 	private float boxWidth = 2.0f;
-	private float boxHeight = 20.0f;
+	private float boxHeight = 10.0f;
 	
-	private float fluidMinX = -11.0f;
-	private float fluidMaxX = 5.0f;
-	private float fluidMinY = -10.0f;
+	private float fluidMinX = -20.0f;
+	private float fluidMaxX = 20.0f;
+	private float fluidMinY = -30.0f;
 	private float fluidMaxY = 10.0f;
 
 	
 	private float rad = 0.6f;
-	private float visc = 0.005f;//0.005f;
+	private float visc = 0.006f;//0.005f;
 	
 	private ArrayList<Integer>[][] hash;
 	private int hashWidth,hashHeight;
@@ -58,9 +58,9 @@ public class Physics {
 	}
 
 	private void initLiquid() {
-	    hash = new ArrayList[40][40];
-	    for (int i=0; i<40; ++i) {
-	    	for (int j=0; j<40; ++j) {
+	    hash = new ArrayList[80][80];
+	    for (int i=0; i<80; ++i) {
+	    	for (int j=0; j<80; ++j) {
 	    		hash[i][j] = new ArrayList<Integer>();
 	    	}
 	    }
@@ -86,13 +86,13 @@ public class Physics {
 	private void dampenLiquid() {
 		for (int i=0; i<liquid_.length; ++i) {
 			Body b = liquid_[i];
-			b.setLinearVelocity(b.getLinearVelocity().mul(0.98f));
+			b.setLinearVelocity(b.getLinearVelocity().mul(0.99f));
 		}
 	}
 	private void checkBounds() {
 		for (int i=0; i<liquid_.length; ++i) {
-			if (liquid_[i].getWorldCenter().y < -10.0f) {
-				world_.destroyBody(liquid_[i]);
+			//if (liquid_[i].getWorldCenter().y < -10.0f) {
+				//world_.destroyBody(liquid_[i]);
 				
 				/*float massPerParticle = totalMass / nParticles;
 				
@@ -118,7 +118,7 @@ public class Physics {
 				b.setMassData(md);
 				b.setSleepingAllowed(false);
 				liquid_[i] = b;*/
-			}
+			//}
 		}
 		/*
 		if (bod.getWorldCenter().y < -15.0f) {
@@ -263,6 +263,7 @@ public class Physics {
 		
 		world_ = new World(gravity_, doSleep_);
 		world_.setContinuousPhysics(true);
+		world_.setWarmStarting(true);
 		entities_ = new Vector<PhysicsEntity>();
 		graphics_ = g;
 	}

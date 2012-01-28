@@ -34,6 +34,7 @@ public class Graphics {
 	private int height_;
 	private int frame_;
 	public float globalRot_;
+	public float globalScale_;
 	private TrueTypeFont font_;
 	private float aspectRatio_;
 	
@@ -44,6 +45,7 @@ public class Graphics {
 		height_ = 600;
 		entities_ = new Vector<GraphicsEntity>();
 		globalRot_ = 30;
+		globalScale_ = 0.07f;
 	}
 
 	public void init() {
@@ -70,7 +72,7 @@ public class Graphics {
 	
 		float aspect = ((float)width_ / (float)height_);
 		aspectRatio_ = aspect;
-		glOrtho(-1.0f*aspect, 1.0f*aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+		glOrtho(-1.0f*aspect, 1.0f*aspect, -1.0f, 1.0f, -10.0f, 10.0f);
 		glMatrixMode(GL_MODELVIEW);
 				
 		// load font from a .ttf file
@@ -119,10 +121,10 @@ public class Graphics {
 	    glPopMatrix();
 	    glPushMatrix();
 	    
-	    glScalef(0.07f, 0.07f, 0.07f);
+	    glScalef(globalScale_, globalScale_, globalScale_);
 	    glRotatef(globalRot_, 0, 0, 1);
 	    
-	    //glEnable(GL_DEPTH_TEST);
+	    glEnable(GL_DEPTH_TEST);
 		Enumeration<GraphicsEntity> e = entities_.elements();
 		while(e.hasMoreElements()) {
 			GraphicsEntity gEntity = e.nextElement();
