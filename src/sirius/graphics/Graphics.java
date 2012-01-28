@@ -33,6 +33,7 @@ public class Graphics {
 	private int width_;
 	private int height_;
 	private int frame_;
+	public float globalRot_;
 	private TrueTypeFont font_;
 	private float aspectRatio_;
 	
@@ -42,6 +43,7 @@ public class Graphics {
 		width_ = 800;
 		height_ = 600;
 		entities_ = new Vector<GraphicsEntity>();
+		globalRot_ = 30;
 	}
 
 	public void init() {
@@ -100,12 +102,14 @@ public class Graphics {
 		
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glLoadIdentity();
+
 	    glPushMatrix();
 	    
 	    TextureImpl.bindNone();
 	    
 	    // Slick has different coordinate system -> fix it
 	    glTranslatef(-aspectRatio_+0.05f, 1.0f, 0.0f);
+
 	    glScalef(0.004f, -0.004f, 0.004f);
 	    font_.drawString(0.0f, 0.0f, "SCORE", Color.black);
 	    font_.drawString(100.0f, 0.0f, ""+frame_, Color.red);
@@ -114,7 +118,10 @@ public class Graphics {
 	    
 	    glPopMatrix();
 	    glPushMatrix();
-	    glScalef(0.1f, 0.1f, 0.1f);
+	    
+	    glScalef(0.07f, 0.07f, 0.07f);
+	    glRotatef(globalRot_, 0, 0, 1);
+	    
 	    //glEnable(GL_DEPTH_TEST);
 		Enumeration<GraphicsEntity> e = entities_.elements();
 		while(e.hasMoreElements()) {

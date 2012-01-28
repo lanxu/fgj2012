@@ -86,14 +86,15 @@ public class Physics {
 	private void dampenLiquid() {
 		for (int i=0; i<liquid_.length; ++i) {
 			Body b = liquid_[i];
-			b.setLinearVelocity(b.getLinearVelocity().mul(0.995f));
+			b.setLinearVelocity(b.getLinearVelocity().mul(0.98f));
 		}
 	}
 	private void checkBounds() {
 		for (int i=0; i<liquid_.length; ++i) {
 			if (liquid_[i].getWorldCenter().y < -10.0f) {
 				world_.destroyBody(liquid_[i]);
-				float massPerParticle = totalMass / nParticles;
+				
+				/*float massPerParticle = totalMass / nParticles;
 				
 				CircleShape pd = new CircleShape();
 				FixtureDef fd = new FixtureDef();
@@ -101,7 +102,7 @@ public class Physics {
 				fd.density = 1.0f;
 				fd.filter.groupIndex = -10;
 				pd.m_radius = .05f;
-				fd.restitution = 0.0f;
+				fd.restitution = 0.4f;
 				fd.friction = 0.0f;
 				float cx = 0.0f + MathUtils.randomFloat(-0.6f,0.6f);
 				float cy = 15.0f + MathUtils.randomFloat(-2.3f,2.0f);
@@ -116,7 +117,7 @@ public class Physics {
 				md.I = 1.0f;
 				b.setMassData(md);
 				b.setSleepingAllowed(false);
-				liquid_[i] = b;
+				liquid_[i] = b;*/
 			}
 		}
 		/*
@@ -290,16 +291,17 @@ public class Physics {
 		*/
 		float cx = 0.0f;
 		float cy = 20.0f;
+		int row = 0;
 		for (int i=0; i<nParticles; ++i) {
 			Entity entity = new Entity();
 			GraphicsEntity gEntity = new GraphicsEntity(entity);
-			gEntity.setCircle(0.1f, 1.0f, 1.0f);
+			gEntity.setCircle(0.2f, 1.0f, 1.0f);
 			gEntity.setMaterial(new Material(0.0f,0.0f,0.5f));
 			
 			PhysicsEntity pEntity = new PhysicsEntity(entity, this);
 			
 			CircleShape pd = new CircleShape();
-			pd.m_radius = 0.05f;
+			pd.m_radius = 0.04f;
 			pEntity.fixtureDef_ = new FixtureDef();
 			pEntity.fixtureDef_.shape = pd;
 			pEntity.fixtureDef_.density = 1f;
@@ -308,9 +310,13 @@ public class Physics {
 			pEntity.fixtureDef_.friction = 0.0f;
 			//BodyDef bd = new BodyDef();
 			BodyDef bd = pEntity.bodydef_;
-			bd.position = new Vec2( MathUtils.randomFloat(cx-boxWidth*.5f ,cx+boxWidth*.5f),
-					MathUtils.randomFloat(cy-boxHeight*.5f,cy+boxHeight*.5f));
-			bd.fixedRotation = true;
+			
+			bd.position = new Vec2( MathUtils.randomFloat(cx-boxWidth ,cx+boxWidth),
+					MathUtils.randomFloat(cy-boxHeight,cy+boxHeight));
+			
+			//bd.position = new Vec2(i*)
+			
+			//bd.fixedRotation = true;
 			bd.type = BodyType.DYNAMIC;
 			
 			addEntity(pEntity);
@@ -345,14 +351,14 @@ public class Physics {
 					                        pEntity.getBody().getPosition().y);*/
 		}
 		// Update Liquids
+		//int n = 3;
 		//for (int i=0; i<n; ++i) {
 			hashLocations();
-			float dt = 1.0f/60.0f;
-			applyLiquidConstraint(dt);
+			applyLiquidConstraint(timeStep);
 		//}
 		dampenLiquid();
 		
-		checkBounds();
+		//checkBounds();
 	}
 	public void addLiquid(float x, float y, int amount) {
 		
