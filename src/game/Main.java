@@ -38,7 +38,7 @@ public class Main {
 	private static Texture tiles_;
 	private static boolean flip_;
 	private static int tile = 1;
-
+	private static Menu menu;
 	private static int frame_ = 0;
 	private static Level1 level_;
 	private static float gravity_ = 10.0f;
@@ -47,7 +47,14 @@ public class Main {
 	private static int mouseStartX = 0;
 	private static int mouseStartY = 0;
 	private static float mouseStartAngle = 0;
+	
+	// Game states
+	public static final int STATE_MENU = 0;
+	public static final int STATE_OUTGAME = 1;
+	public static final int STATE_INGAME = 2; 
 
+
+	public static int state_ = 0;
 	public static void main(String[] args) {
 		try {
 			// Init the game
@@ -79,12 +86,18 @@ public class Main {
 		// Init managers
 		graphics_.init();
 		physics_.init();
-		level_ = new Level1();
+		
+	//	level_ = new Level1();
+		menu = new Menu();
+		
 		
 	}
 
 	private static void render() {
-		graphics_.renderEntities();
+		//if(state_ == STATE_INGAME) {		
+			graphics_.renderEntities();
+		//}
+		
 		Display.update();
 	}
 
@@ -123,58 +136,144 @@ public class Main {
 	}
 
 	private static void logic() {
-		physics_.update();
-		if(input_.isDown(Input.KEY_RIGHT)) {
-			rotation_--;
-		}
-		if(input_.isDown(Input.KEY_LEFT)) {
-			rotation_++;
-		}        
+		// INGAME
+		if(state_ == STATE_INGAME) {
+			physics_.update();
+			if(input_.isDown(Input.KEY_RIGHT)) {
+				rotation_--;
+			}
+			if(input_.isDown(Input.KEY_LEFT)) {
+				rotation_++;
+			}
+			if(input_.isDown(Input.KEY_A)) {
+				physics_.init();
+				graphics_.init();
+				level_ = new Level1();
+				graphics_.state_ = STATE_INGAME;
+			}
+			Mouse.getEventButtonState();
+			
+			float z = Mouse.getDWheel();
+			//System.out.println("H "+z);
+			if(z < 0) graphics_.globalScale_-=0.01f;
+			if(z > 0) graphics_.globalScale_+=0.01f;
+			int x = Mouse.getX();
+			int y = Mouse.getY();
 
-		Mouse.getEventButtonState();
-		
-		float z = Mouse.getDWheel();
-		//System.out.println("H "+z);
-		if(z < 0) graphics_.globalScale_-=0.01f;
-		if(z > 0) graphics_.globalScale_+=0.01f;
-		
-		if (Mouse.isButtonDown(0)) {
-			if(mouseDown_ == false) {
+			System.out.println("X: "+x+"  y: "+y);
 
-				mouseStartAngle = getAngle(Mouse.getX(), Mouse.getY());
-				//mouseStartAngle = getAngleSlider(Mouse.getX(), 400);
-				mouseDown_ = true;
+			if (Mouse.isButtonDown(0)) {
+			
+				if(mouseDown_ == false) {
+
+					mouseStartAngle = getAngle(Mouse.getX(), Mouse.getY());
+					//mouseStartAngle = getAngleSlider(Mouse.getX(), 400);
+					mouseDown_ = true;
+				} else {
+					float mouseEndAngle;
+					mouseEndAngle = getAngle(Mouse.getX(), Mouse.getY());
+					//mouseEndAngle = getAngleSlider(Mouse.getX(), 400);
+
+					float drot = (float) ((mouseEndAngle - mouseStartAngle)*(180.0f/3.14f));
+					//System.out.println("Drot: "+drot);
+					//System.out.println("x: " + Mouse.getX());
+					//System.out.println("y: " + Mouse.getY());
+					//System.out.println("start: "+mouseStartAngle);
+					//System.out.println("stop : "+mouseEndAngle);
+
+					mouseDown_ = false;
+					rotation_ += drot;
+
+				}
+
+				//boolean leftButtonDown = Mouse.isButtonDown(0);
+				//boolean rightButtonDown = Mouse.isButtonDown(1);
+				// NEXT (if score > 300)
+				if(x > 650 && x < 790 && y > 7 && y < 44) {
+					System.out.println("Next");
+				}
+				// Back (if score > 300)
+				if(x > 9 && x < 139 && y > 7 && y < 44) {
+					System.out.println("Back");
+					graphics_.init();
+					physics_.init();
+					graphics_.state_ = STATE_MENU;
+					state_ = STATE_MENU;
+					rotation_ = 0;
+				//	level_ = new Level1();
+					menu = new Menu();
+				}	
+
 			} else {
-				float mouseEndAngle;
-				mouseEndAngle = getAngle(Mouse.getX(), Mouse.getY());
-				//mouseEndAngle = getAngleSlider(Mouse.getX(), 400);
-
-				float drot = (float) ((mouseEndAngle - mouseStartAngle)*(180.0f/3.14f));
-				//System.out.println("Drot: "+drot);
-				//System.out.println("x: " + Mouse.getX());
-				//System.out.println("y: " + Mouse.getY());
-				//System.out.println("start: "+mouseStartAngle);
-				//System.out.println("stop : "+mouseEndAngle);
-
 				mouseDown_ = false;
-				rotation_ += drot;
-
 			}
 
-			//boolean leftButtonDown = Mouse.isButtonDown(0);
-			//boolean rightButtonDown = Mouse.isButtonDown(1);
+			Vec2 vector = new Vec2((float)(gravity_*Math.sin(-rotation_/(180/3.14f))), (float)(-gravity_*Math.cos(-rotation_/(180/3.14f))));        
+			physics_.world_.setGravity(vector);
+			graphics_.globalRot_ = rotation_;
 
+			graphics_.score_ = physics_.transferredLiquid_;
+			//rotation_ += 0.1f;
+		// MENU
+		} else if(state_ == STATE_MENU) {
+			physics_.update();
+			int x = Mouse.getX();
+			int y = Mouse.getY();
 
+			if (Mouse.isButtonDown(0)) {
+				// Level 1
+				if(x > 470 && x < 570 && y > 265 && y < 380) {
+					physics_.init();
+					graphics_.init();
+					level_ = new Level1();
+					state_ = STATE_INGAME;
+					graphics_.state_ = STATE_INGAME;
+					graphics_.currentLevel_ = 0;
+				}
+				// Level 2
+				if(x > 650 && x < 750 && y > 265 && y < 380) {
+					System.out.println("Level2");
+				/*	physics_.init();
+					graphics_.init();
+					level_ = new Level1();
+					state_ = STATE_INGAME;
+					graphics_.state_ = STATE_INGAME;
+					*/
+					graphics_.currentLevel_ = 0;
+				}				
+				// Level 3
+				if(x > 470 && x < 570 && y < 200 && y > 85) {
+					System.out.println("Level3");
+				/*	physics_.init();
+					graphics_.init();
+					level_ = new Level1();
+					state_ = STATE_INGAME;
+					graphics_.state_ = STATE_INGAME;
+					*/
+					graphics_.currentLevel_ = 0;
+				}
+				// Level 4
+				if(x > 650 && x < 750 && y < 200 && y > 85) {
+					System.out.println("Level4");
+				/*	physics_.init();
+					graphics_.init();
+					level_ = new Level1();
+					state_ = STATE_INGAME;
+					graphics_.state_ = STATE_INGAME;
+					*/
+					graphics_.currentLevel_ = 0;
+				}	
+			}
+		// OUTGAME
+		} else if(state_ == STATE_OUTGAME) {
+			
 		} else {
-			mouseDown_ = false;
+			// FFFUU
 		}
+		
+       
 
-		Vec2 vector = new Vec2((float)(gravity_*Math.sin(-rotation_/(180/3.14f))), (float)(-gravity_*Math.cos(-rotation_/(180/3.14f))));        
-		physics_.world_.setGravity(vector);
-		graphics_.globalRot_ = rotation_;
 
-		graphics_.score_ = physics_.transferredLiquid_;
-		//rotation_ += 0.1f;
 
 	}
 

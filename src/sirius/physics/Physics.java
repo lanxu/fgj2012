@@ -36,7 +36,7 @@ public class Physics {
 	private float boxWidth = 4.0f;
 	private float boxHeight = 20.0f;
 	
-	private float fluidMinX = -20.0f;
+	private float fluidMinX = -40.0f;
 	private float fluidMaxX = 20.0f;
 	private float fluidMinY = -25.0f;
 	private float fluidMaxY = 25.0f;
@@ -102,55 +102,105 @@ public class Physics {
 		for (int i=0; i<curParticle; ++i) {
 			//if (liquid_[i].getWorldCenter().y < -5.0f) {
 			if(liquid_[i].getUserData() != null) {
-			if(((PhysicsEntity)liquid_[i].getUserData()).setToDie_ == true)
-			{
-				world_.destroyBody(liquid_[i]);
-				removeEntity(((PhysicsEntity)liquid_[i].getUserData()));
-				graphics_.removeEntity(((PhysicsEntity)liquid_[i].getUserData()).getEntity());
-				
-				
-				float massPerParticle = totalMass / nParticles;
-							Entity entity = new Entity();
-				GraphicsEntity gEntity = new GraphicsEntity(entity);
-				gEntity.setCircle(0.6f, 1.0f,1.0f);
-				gEntity.setMaterial(new Material(0.2f, 0.2f, 1.0f));
-				
-				PhysicsEntity pEntity = new PhysicsEntity(entity, this);
-				
-				CircleShape pd = new CircleShape();
-				pd.m_radius = 0.04f;
-				pEntity.fixtureDef_ = new FixtureDef();
-				pEntity.fixtureDef_.shape = pd;
-				pEntity.fixtureDef_.density = 1f;
-				pEntity.fixtureDef_.filter.groupIndex = -10;	
-				pEntity.fixtureDef_.restitution = 0.4f;
-				pEntity.fixtureDef_.friction = 0.0f;
-				//BodyDef bd = new BodyDef();
-				BodyDef bd = pEntity.bodydef_;
-				float cx = 0.0f;
-				float cy = 0.0f;
-				bd.position = new Vec2( MathUtils.randomFloat(cx-0.5f ,cx+0.5f),
-						MathUtils.randomFloat(cy-0.5f,cy+0.5f));
-				
-				//bd.position = new Vec2(i*)
-				
-				//bd.fixedRotation = true;
-				bd.type = BodyType.DYNAMIC;
-				
-				addEntity(pEntity);
-				graphics_.addEntity(gEntity);
-				pEntity.contactId_ = 666;
-				pEntity.body_.setUserData(pEntity);
-				
-				//b.createFixture(fd).setUserData(666);
-				
-				MassData md = new MassData();
-				md.mass = massPerParticle;
-				md.I = 1.0f;
-				pEntity.body_.setMassData(md);
-				pEntity.body_.setSleepingAllowed(false);
-				liquid_[i] = pEntity.body_;
-				transferredLiquid_++;
+				if(((PhysicsEntity)liquid_[i].getUserData()).setToDie_ == true)
+				{
+					world_.destroyBody(liquid_[i]);
+					removeEntity(((PhysicsEntity)liquid_[i].getUserData()));
+					graphics_.removeEntity(((PhysicsEntity)liquid_[i].getUserData()).getEntity());
+
+
+					float massPerParticle = totalMass / nParticles;
+					Entity entity = new Entity();
+					GraphicsEntity gEntity = new GraphicsEntity(entity);
+					gEntity.setCircle(0.6f, 1.0f,1.0f);
+					gEntity.setMaterial(new Material(0.2f, 0.2f, 1.0f));
+
+					PhysicsEntity pEntity = new PhysicsEntity(entity, this);
+
+					CircleShape pd = new CircleShape();
+					pd.m_radius = 0.04f;
+					pEntity.fixtureDef_ = new FixtureDef();
+					pEntity.fixtureDef_.shape = pd;
+					pEntity.fixtureDef_.density = 1f;
+					pEntity.fixtureDef_.filter.groupIndex = -10;	
+					pEntity.fixtureDef_.restitution = 0.4f;
+					pEntity.fixtureDef_.friction = 0.0f;
+					//BodyDef bd = new BodyDef();
+					BodyDef bd = pEntity.bodydef_;
+					float cx = 0.0f;
+					float cy = 0.0f;
+					bd.position = new Vec2( MathUtils.randomFloat(cx-0.5f ,cx+0.5f),
+							MathUtils.randomFloat(cy-0.5f,cy+0.5f));
+
+					//bd.position = new Vec2(i*)
+
+					//bd.fixedRotation = true;
+					bd.type = BodyType.DYNAMIC;
+
+					addEntity(pEntity);
+					graphics_.addEntity(gEntity);
+					pEntity.contactId_ = 666;
+					pEntity.body_.setUserData(pEntity);
+
+					//b.createFixture(fd).setUserData(666);
+
+					MassData md = new MassData();
+					md.mass = massPerParticle;
+					md.I = 1.0f;
+					pEntity.body_.setMassData(md);
+					pEntity.body_.setSleepingAllowed(false);
+					liquid_[i] = pEntity.body_;
+					transferredLiquid_++;
+				}
+				if(((PhysicsEntity)liquid_[i].getUserData()).getEntity().getY() < -25.0f)
+				{
+					world_.destroyBody(liquid_[i]);
+					removeEntity(((PhysicsEntity)liquid_[i].getUserData()));
+					graphics_.removeEntity(((PhysicsEntity)liquid_[i].getUserData()).getEntity());
+
+
+					float massPerParticle = totalMass / nParticles;
+					Entity entity = new Entity();
+					GraphicsEntity gEntity = new GraphicsEntity(entity);
+					gEntity.setCircle(0.6f, 1.0f,1.0f);
+					gEntity.setMaterial(new Material(0.2f, 0.2f, 1.0f));
+
+					PhysicsEntity pEntity = new PhysicsEntity(entity, this);
+
+					CircleShape pd = new CircleShape();
+					pd.m_radius = 0.04f;
+					pEntity.fixtureDef_ = new FixtureDef();
+					pEntity.fixtureDef_.shape = pd;
+					pEntity.fixtureDef_.density = 1f;
+					pEntity.fixtureDef_.filter.groupIndex = -10;	
+					pEntity.fixtureDef_.restitution = 0.4f;
+					pEntity.fixtureDef_.friction = 0.0f;
+					//BodyDef bd = new BodyDef();
+					BodyDef bd = pEntity.bodydef_;
+					float cx = -15.0f;
+					float cy = 35.0f;
+					bd.position = new Vec2( MathUtils.randomFloat(cx-10.5f ,cx+10.5f),
+							MathUtils.randomFloat(cy-1.0f,cy+1.0f));
+
+					//bd.position = new Vec2(i*)
+
+					//bd.fixedRotation = true;
+					bd.type = BodyType.DYNAMIC;
+
+					addEntity(pEntity);
+					graphics_.addEntity(gEntity);
+					pEntity.contactId_ = 666;
+					pEntity.body_.setUserData(pEntity);
+
+					//b.createFixture(fd).setUserData(666);
+
+					MassData md = new MassData();
+					md.mass = massPerParticle;
+					md.I = 1.0f;
+					pEntity.body_.setMassData(md);
+					pEntity.body_.setSleepingAllowed(false);
+					liquid_[i] = pEntity.body_;
+					transferredLiquid_++;
 				}
 			}
 		}
@@ -374,8 +424,22 @@ public class Physics {
 	}
 	public void init() {
 		initLiquid();
+		
+		// Delete everything
+		Enumeration<PhysicsEntity> e = entities_.elements();
+		while(e.hasMoreElements()) {
+			PhysicsEntity pEntity = e.nextElement();			
+			removeEntity(pEntity);
+			world_.destroyBody(pEntity.body_);
+		}
+		//for(int i = 0; i < curParticle; i++) {
+			//world_.destroyBody(liquid_[i]);
+		//}
+		
 		liquid_ = new Body[nParticles];
 		transferredLiquid_ = 0;
+		curParticle = 0;
+		
 
 	}	   
 

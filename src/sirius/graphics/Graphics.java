@@ -40,8 +40,17 @@ public class Graphics {
 	public float globalRot_;
 	public float globalScale_;
 	private TrueTypeFont font_;
+	private TrueTypeFont font2_;
+	private TrueTypeFont font3_;
 	private float aspectRatio_;
+	private Texture button_;
 	public int score_;
+	public int score1_;
+	public int score2_;
+	public int score3_;
+	public int score4_;
+	public int currentLevel_;
+	public int state_;
 	
 	private Vector<GraphicsEntity> entities_;
 	
@@ -49,12 +58,16 @@ public class Graphics {
 		width_ = 800;
 		height_ = 600;
 		entities_ = new Vector<GraphicsEntity>();
-		globalRot_ = 30;
+		globalRot_ = 0;
 		globalScale_ = 0.04f;
 		score_ = 0;
-	}
-
-	public void init() {
+		score1_ = 0;
+		score2_ = 0;
+		score3_ = 0;
+		score4_ = 0;
+		currentLevel_ = 0;
+		state_ = 0;
+		
 		// Initialize OpenGL (using opengl 1.x stuff)
 		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 		
@@ -64,6 +77,7 @@ public class Graphics {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_ALWAYS);
+
 		
 		/*
 		GL11.glEnable(GL11.GL_BLEND);
@@ -80,7 +94,10 @@ public class Graphics {
 		aspectRatio_ = aspect;
 		glOrtho(-1.0f*aspect, 1.0f*aspect, -1.0f, 1.0f, -10.0f, 10.0f);
 		glMatrixMode(GL_MODELVIEW);
-				
+		
+	}
+
+	public void init() {
 		// load font from a .ttf file
 		try {
 			InputStream inputStream	= ResourceLoader.getResourceAsStream("resources/Fresca-Regular.ttf");
@@ -91,8 +108,31 @@ public class Graphics {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("H; " + font_.getHeight() + " " + font_.getHeight("hello"));
-		
+	
+		try {
+			InputStream inputStream	= ResourceLoader.getResourceAsStream("resources/Fresca-Regular.ttf");
+			
+			Font awtFont2 = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+			awtFont2 = awtFont2.deriveFont(28f); // set font size
+			font2_ = new TrueTypeFont(awtFont2, true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		try {
+			InputStream inputStream	= ResourceLoader.getResourceAsStream("resources/Fresca-Regular.ttf");
+			
+			Font awtFont2 = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+			awtFont2 = awtFont2.deriveFont(16f); // set font size
+			font3_ = new TrueTypeFont(awtFont2, true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//System.out.println("H; " + font_.getHeight() + " " + font_.getHeight("hello"));
+	
+		entities_.clear();
+		globalRot_ = 0;
+		score_ = 0;
 		
 	}
 	
@@ -119,8 +159,43 @@ public class Graphics {
 	    glTranslatef(-aspectRatio_+0.05f, 1.0f, 0.0f);
 
 	    glScalef(0.004f, -0.004f, 0.004f);
-	    font_.drawString(0.0f, 0.0f, "COMPLETED", Color.black);
-	    font_.drawString(150.0f, 0.0f, " "+score_+" / 300", Color.black);
+	    
+
+	    if(state_ == Main.STATE_MENU) {
+		    font_.drawString(425.0f, 130.0f, "SELECT LEVEL", Color.black);
+		    font2_.drawString(400.0f, 288.0f, " "+score1_+" / 500", Color.black);
+		    font2_.drawString(400.0f, 440.0f, " "+score2_+" / 500", Color.black);
+		    font2_.drawString(550.0f, 288.0f, " "+score3_+" / 500", Color.black);
+		    font2_.drawString(550.0f, 440.0f, " "+score4_+" / 500", Color.black);
+	    } else if(state_ == Main.STATE_INGAME) {
+	    	font3_.drawString(540.0f, 400.0f, "TO NEXT LEVEL", Color.black);
+	    	//score_ = 160;
+	    	Color color;
+	    	if(score_ < 150) {
+	    		color = Color.red;
+	    	} else if(score_ > 150 && score_ < 300) {
+	    		color = Color.orange;
+	    	} else {
+	    		color = Color.green;
+	    		
+	    		font_.drawString(550.0f, 450.0f, "NEXT", color);
+	    	}
+	    	
+	    	font_.drawString(565.0f, 420.0f, " / 300", Color.black);
+	    	font_.drawString(510.0f, 420.0f, " "+score_, color);
+	    	font_.drawString(8.0f, 450.0f, "EXIT", color);
+	    	
+	    	if(currentLevel_ == 0) { if(score1_ < score_) score1_=score_; }
+	    	if(currentLevel_ == 1) { if(score2_ < score_) score1_=score_; }
+	    	if(currentLevel_ == 2) { if(score3_ < score_) score1_=score_; }
+	    	if(currentLevel_ == 3) { if(score4_ < score_) score1_=score_; }
+	    	
+	    	
+	    } else {
+	    	font_.drawString(0.0f, 0.0f, "DEBUG", Color.black);
+	    }
+	    
+	    
 	    glColor3f(1.0f, 1.0f, 1.0f);
 	    // Return
 	    TextureImpl.unbind();
@@ -178,9 +253,7 @@ public class Graphics {
 			}
 			if(m.isTextured()) {
 				tex.bind();
-				
-				
-				
+
 				Shape shape = gEntity.getPolygonShape();
 				Shape texShape = gEntity.getTextureShape();
 				if(shape.getShapeType() == Shape.POLYGON) {
@@ -213,6 +286,7 @@ public class Graphics {
 				
 				
 			}
+			
 			
 			/*float x = ge.getEntity().getX();
 			float y = ge.getEntity().getY();
