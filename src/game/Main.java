@@ -40,7 +40,8 @@ public class Main {
 	private static int tile = 1;
 
 	private static int frame_ = 0;
-	private static Level1 level_;
+	private static Level1 level1_;
+	private static Level2 level2_;
 	private static float gravity_ = 10.0f;
 	private static float rotation_ = 0;
 	private static boolean mouseDown_ = false;
@@ -79,7 +80,8 @@ public class Main {
 		// Init managers
 		graphics_.init();
 		physics_.init();
-		level_ = new Level1();
+		//level1_ = new Level1();
+		level2_ = new Level2();
 		
 	}
 
