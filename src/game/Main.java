@@ -43,6 +43,7 @@ public class Main {
 	private static Level1 level1_;
 	private static Level2 level2_;
 	private static Level3 level3_;
+	private static Level4 level4_;
 	private static float gravity_ = 10.0f;
 	private static float rotation_ = 0;
 	private static boolean mouseDown_ = false;
@@ -82,7 +83,7 @@ public class Main {
 		graphics_.init();
 		physics_.init();
 		//level1_ = new Level1();
-		level3_ = new Level3();
+		level4_ = new Level4();
 		
 	}
 
