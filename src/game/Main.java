@@ -40,13 +40,18 @@ public class Main {
 	private static int tile = 1;
 	private static Menu menu;
 	private static int frame_ = 0;
-	private static Level1 level_;
+	private static Level1 level1_;
+	private static Level2 level2_;
+	private static Level3 level3_;
+	private static Level4 level4_;
 	private static float gravity_ = 10.0f;
 	private static float rotation_ = 0;
 	private static boolean mouseDown_ = false;
 	private static int mouseStartX = 0;
 	private static int mouseStartY = 0;
 	private static float mouseStartAngle = 0;
+	private static boolean clickedExit = false;
+	private static boolean mouseHeld = false;
 	
 	// Game states
 	public static final int STATE_MENU = 0;
@@ -86,10 +91,9 @@ public class Main {
 		// Init managers
 		graphics_.init();
 		physics_.init();
-		
+	
 	//	level_ = new Level1();
 		menu = new Menu();
-		
 		
 	}
 
@@ -148,7 +152,7 @@ public class Main {
 			if(input_.isDown(Input.KEY_A)) {
 				physics_.init();
 				graphics_.init();
-				level_ = new Level1();
+				//level_ = new Level1();
 				graphics_.state_ = STATE_INGAME;
 			}
 			Mouse.getEventButtonState();
@@ -160,7 +164,7 @@ public class Main {
 			int x = Mouse.getX();
 			int y = Mouse.getY();
 
-			System.out.println("X: "+x+"  y: "+y);
+			//System.out.println("X: "+x+"  y: "+y);
 
 			if (Mouse.isButtonDown(0)) {
 			
@@ -190,11 +194,56 @@ public class Main {
 				//boolean rightButtonDown = Mouse.isButtonDown(1);
 				// NEXT (if score > 300)
 				if(x > 650 && x < 790 && y > 7 && y < 44) {
-					System.out.println("Next");
+					//System.out.println("Next");
+					if(graphics_.currentLevel_ == 0) {
+						physics_.init();
+						graphics_.init();
+						level2_ = new Level2();
+						state_ = STATE_INGAME;
+						graphics_.state_ = STATE_INGAME;
+						
+						graphics_.currentLevel_ = 1;						
+					} else if(graphics_.currentLevel_ == 1) {
+						physics_.init();
+						graphics_.init();
+						level3_ = new Level3();
+						state_ = STATE_INGAME;
+						graphics_.state_ = STATE_INGAME;
+						
+						graphics_.currentLevel_ = 2;							
+					} else if(graphics_.currentLevel_ == 2) {
+						physics_.init();
+						graphics_.init();
+						level4_ = new Level4();
+						state_ = STATE_INGAME;
+						graphics_.state_ = STATE_INGAME;
+						
+						graphics_.currentLevel_ = 3;							
+					} else {
+						graphics_.init();
+						physics_.init();
+						graphics_.state_ = STATE_MENU;
+						state_ = STATE_MENU;
+						rotation_ = 0;
+					//	level_ = new Level1();
+						menu = new Menu();						
+					}
+					
+				}
+				if(mouseHeld == false) {
+					if(x > 9 && x < 139 && y > 7 && y < 44) {
+						clickedExit = true;
+					}
+					mouseHeld = true;
 				}
 				// Back (if score > 300)
-				if(x > 9 && x < 139 && y > 7 && y < 44) {
-					System.out.println("Back");
+
+			} else {
+				mouseDown_ = false;
+				mouseHeld = false;
+				if(clickedExit) {
+					if(x > 9 && x < 139 && y > 7 && y < 44) {
+					//System.out.println("Back");
 					graphics_.init();
 					physics_.init();
 					graphics_.state_ = STATE_MENU;
@@ -202,10 +251,9 @@ public class Main {
 					rotation_ = 0;
 				//	level_ = new Level1();
 					menu = new Menu();
-				}	
-
-			} else {
-				mouseDown_ = false;
+					clickedExit = false;
+					}
+				}
 			}
 
 			Vec2 vector = new Vec2((float)(gravity_*Math.sin(-rotation_/(180/3.14f))), (float)(-gravity_*Math.cos(-rotation_/(180/3.14f))));        
@@ -225,7 +273,7 @@ public class Main {
 				if(x > 470 && x < 570 && y > 265 && y < 380) {
 					physics_.init();
 					graphics_.init();
-					level_ = new Level1();
+					level1_ = new Level1();
 					state_ = STATE_INGAME;
 					graphics_.state_ = STATE_INGAME;
 					graphics_.currentLevel_ = 0;
@@ -233,35 +281,35 @@ public class Main {
 				// Level 2
 				if(x > 650 && x < 750 && y > 265 && y < 380) {
 					System.out.println("Level2");
-				/*	physics_.init();
+					physics_.init();
 					graphics_.init();
-					level_ = new Level1();
+					level2_ = new Level2();
 					state_ = STATE_INGAME;
 					graphics_.state_ = STATE_INGAME;
-					*/
-					graphics_.currentLevel_ = 0;
+					
+					graphics_.currentLevel_ = 1;
 				}				
 				// Level 3
 				if(x > 470 && x < 570 && y < 200 && y > 85) {
 					System.out.println("Level3");
-				/*	physics_.init();
+					physics_.init();
 					graphics_.init();
-					level_ = new Level1();
+					level3_ = new Level3();
 					state_ = STATE_INGAME;
 					graphics_.state_ = STATE_INGAME;
-					*/
-					graphics_.currentLevel_ = 0;
+					
+					graphics_.currentLevel_ = 2;
 				}
 				// Level 4
 				if(x > 650 && x < 750 && y < 200 && y > 85) {
 					System.out.println("Level4");
-				/*	physics_.init();
+					physics_.init();
 					graphics_.init();
-					level_ = new Level1();
+					level4_ = new Level4();
 					state_ = STATE_INGAME;
 					graphics_.state_ = STATE_INGAME;
-					*/
-					graphics_.currentLevel_ = 0;
+					
+					graphics_.currentLevel_ = 3;
 				}	
 			}
 		// OUTGAME

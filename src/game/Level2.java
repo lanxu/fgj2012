@@ -7,13 +7,13 @@ import sirius.graphics.GraphicsEntity;
 import sirius.graphics.Material;
 import sirius.physics.PhysicsEntity;
 
-public class Level1 {
+public class Level2 {
 	public Vector<LevelObject> objects_;
 	
-	public Level1() {
+	public Level2() {
 		objects_ = new Vector<LevelObject>();
 		
-		createBottle(0,-2.5f);
+		createBottle(0, 0.5f);
 		//createTrap(-10.0f, 0.0f, 0.0f, 1.0f);
 		
 		// walls
@@ -22,47 +22,45 @@ public class Level1 {
 		createBox(-19.0f, +22.5f, 45.0f, 1.0f, -90);	
 		createBox( 19.0f, +22.5f, 45.0f, 1.0f, -90);
 		
-		// bottom cup/bottle
+		// bottom cup/bottle (start)
 		createBox(-4.0f,-20.5f, 5.0f, 1.0f, 90);
 		createBox( 4.0f,-20.5f, 5.0f, 1.0f, 90);
 		createBox(-4.0f,-20.5f, 8.0f, 1.0f, 0);
 		
 		Main.physics_.addLiquid(0, -19.0f, 500);
 		
-		// Bottom row
-		createBox(-15.0f, -7.5f, 5.0f, 1.0f, -45);
-		createBox(-15.0f, -7.5f, 5.0f, 1.0f, -90-45);
+		// Center container
+		// Bottom cup/target zone
+		createBox(0.0f, -12.0f, 7.0f, 1.0f, 45);
+		createBox(0.0f, -12.0f, 7.0f, 1.0f, 180-45);
 
-		createBox(-5.0f, -7.5f, 5.0f, 1.0f, -45);
-		createBox(-5.0f, -7.5f, 5.0f, 1.0f, -90-45);
+		// Inner long walls
+		createBox(-5.0f, -7.5f, 19.0f, 1.0f, 90);
+		createBox( 5.0f, -7.5f, 19.0f, 1.0f, 90);
 
-		createBox(15.0f, -7.5f, 5.0f, 1.0f, -45);
-		createBox(15.0f, -7.5f, 5.0f, 1.0f, -90-45);
+		// Outer long walls
+		createBox(-8.0f, -4.5f, 13.0f, 1.0f, 90);
+		createBox( 8.0f, -4.5f, 13.0f, 1.0f, 90);
 
-		createBox(5.0f, -7.5f, 5.0f, 1.0f, -45);
-		createBox(5.0f, -7.5f, 5.0f, 1.0f, -90-45);
-		createBox(-2f, -11.0f, 4.0f, 1.0f, 0);
-		
-		// Middle row
-		createBox(10.0f,  2.5f, 5.0f, 1.0f, -45);
-		createBox(10.0f,  2.5f, 5.0f, 1.0f, -90-45);
-		
-		createBox(-10.0f, 2.5f, 5.0f, 1.0f, -45);
-		createBox(-10.0f, 2.5f, 5.0f, 1.0f, -90-45);
-		
-		createBox(0.0f, 7.5f, 7.0f, 1.0f, -45);
-		createBox(0.0f, 7.5f, 7.0f, 1.0f, -90-45);		
-		// Bottom row
-		createBox(7.5f, 19.5f, 7.0f, 1.0f, -45);
-		createBox(7.5f, 19.5f, 7.0f, 1.0f, -90-45);
-		
-		createBox(-7.5f,19.5f, 7.0f, 1.0f, -45);
-		createBox(-7.5f,19.5f, 7.0f, 1.0f, -90-45);
-		
+		// Outer long wall bottom flips
+		createBox(-8.0f, -4.5f, 5.0f, 1.0f, 180-45);
+		createBox( 8.0f, -4.5f, 5.0f, 1.0f, 45);
 
-		// Bottom box (goal)
-		createBox(-5.0f,22.5f, 5.0f, 1.0f, -90);
-		createBox( 5.0f,22.5f, 5.0f, 1.0f, -90);
+		// Horizontal separators
+		createBox(-8.0f, 8.5f, 11.0f, 1.0f, 180);
+		createBox( 8.0f, 8.5f, 11.0f, 1.0f, 0);
+		
+		// Right side top barrier
+		createBox(10.0f,  13.5f, 5.0f, 1.0f, 0);
+		createBox(10.0f,  13.5f, 5.0f, 1.0f, 135);
+		
+		// Left side top barrier
+		createBox(-10.0f,  13.5f, 5.0f, 1.0f, -180);
+		createBox(-10.0f,  13.5f, 5.0f, 1.0f, 45);
+		
+		// Top middle barrier
+		createBox(0.0f, 13.5f, 5.0f, 1.0f, 45);
+		createBox(0.0f, 13.5f, 5.0f, 1.0f, 135);
 		
 		// Goal
 		
@@ -71,19 +69,20 @@ public class Level1 {
 		GraphicsEntity gEntity;
 		PhysicsEntity pEntity;
 		entity = new Entity();
-		entity.setPosition(0.0f, 19.0f);
+		entity.setPosition(0.0f, -9.0f);
 		entity.setRotation(0);
 		entity.setId(Main.ID_GOAL);
 		
 		gEntity = new GraphicsEntity(entity);
 		gEntity.setMaterial(new Material("resources/Ouroboros-simple.png"));
-		gEntity.setBox(3.0f, 3.0f);
+		gEntity.setBox(1.5f, 1.5f);
 		Main.graphics_.addEntity(gEntity);
 		
 		pEntity = new PhysicsEntity(entity, Main.physics_);
-		pEntity.setBox(3.0f, 3.0f, false);
+		pEntity.setBox(1.5f, 1.5f, false);
 		pEntity.setType(PhysicsEntity.TYPE_SENSOR);
 		Main.physics_.addEntity(pEntity);	
+		
 		
 	}
 	private void createBox(float sx, float sy, float length, float thickness, float angle) {
@@ -255,3 +254,4 @@ public class Level1 {
 	}
 	
 }
+

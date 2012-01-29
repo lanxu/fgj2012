@@ -132,6 +132,7 @@ public class Graphics {
 	
 		entities_.clear();
 		globalRot_ = 0;
+		globalScale_ = 0.04f;
 		score_ = 0;
 		
 	}
@@ -163,13 +164,13 @@ public class Graphics {
 
 	    if(state_ == Main.STATE_MENU) {
 		    font_.drawString(425.0f, 130.0f, "SELECT LEVEL", Color.black);
-		    font2_.drawString(400.0f, 288.0f, " "+score1_+" / 500", Color.black);
-		    font2_.drawString(400.0f, 440.0f, " "+score2_+" / 500", Color.black);
-		    font2_.drawString(550.0f, 288.0f, " "+score3_+" / 500", Color.black);
-		    font2_.drawString(550.0f, 440.0f, " "+score4_+" / 500", Color.black);
+		    font2_.drawString(380.0f, 288.0f, " "+score1_+" / 500", Color.black);
+		    font2_.drawString(530.0f, 288.0f, " "+score2_+" / 500", Color.black);
+		    font2_.drawString(380.0f, 440.0f, " "+score3_+" / 500", Color.black);
+		    font2_.drawString(530.0f, 440.0f, " "+score4_+" / 500", Color.black);
 	    } else if(state_ == Main.STATE_INGAME) {
 	    	font3_.drawString(540.0f, 400.0f, "TO NEXT LEVEL", Color.black);
-	    	//score_ = 160;
+	    	//score_ = 500;
 	    	Color color;
 	    	if(score_ < 150) {
 	    		color = Color.red;
@@ -186,9 +187,9 @@ public class Graphics {
 	    	font_.drawString(8.0f, 450.0f, "EXIT", color);
 	    	
 	    	if(currentLevel_ == 0) { if(score1_ < score_) score1_=score_; }
-	    	if(currentLevel_ == 1) { if(score2_ < score_) score1_=score_; }
-	    	if(currentLevel_ == 2) { if(score3_ < score_) score1_=score_; }
-	    	if(currentLevel_ == 3) { if(score4_ < score_) score1_=score_; }
+	    	if(currentLevel_ == 1) { if(score2_ < score_) score2_=score_; }
+	    	if(currentLevel_ == 2) { if(score3_ < score_) score3_=score_; }
+	    	if(currentLevel_ == 3) { if(score4_ < score_) score4_=score_; }
 	    	
 	    	
 	    } else {

@@ -22,9 +22,9 @@ public class Menu {
 		Main.graphics_.addEntity(gEntity);
 		
 		drawButton(10,-2,"resources/level1.png");
-		drawButton(25,-2,"");
-		drawButton(10,-17,"");
-		drawButton(25,-17,"");
+		drawButton(25,-2,"resources/level2.png");
+		drawButton(10,-17,"resources/level3.png");
+		drawButton(25,-17,"resources/level4.png");
 		
 		createBox(-31.0f,30.0f,60.0f, 3.0f, -90.0f);
 		
