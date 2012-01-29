@@ -47,6 +47,7 @@ public class Main {
 	private static float gravity_ = 10.0f;
 	private static float rotation_ = 0;
 	private static boolean mouseDown_ = false;
+	private static boolean mouseDownRight_ = false;
 	private static int mouseStartX = 0;
 	private static int mouseStartY = 0;
 	private static float mouseStartAngle = 0;
@@ -136,7 +137,7 @@ public class Main {
 
 		angle = (dx / 400) * 1.0f * 3.14159f;
 
-		return angle;
+		return angle * 2.0f;
 	}
 
 	private static void logic() {
@@ -256,6 +257,34 @@ public class Main {
 				}
 			}
 
+			if (Mouse.isButtonDown(1)) {
+				
+				if(mouseDownRight_ == false) {
+
+					//mouseStartAngle = getAngle(Mouse.getX(), Mouse.getY());
+					mouseStartAngle = getAngleSlider(Mouse.getX(), 400);
+					mouseDownRight_ = true;
+				} else {
+					float mouseEndAngle;
+					//mouseEndAngle = getAngle(Mouse.getX(), Mouse.getY());
+					mouseEndAngle = getAngleSlider(Mouse.getX(), 400);
+
+					float drot = (float) ((mouseEndAngle - mouseStartAngle)*(180.0f/3.14f));
+					//System.out.println("Drot: "+drot);
+					//System.out.println("x: " + Mouse.getX());
+					//System.out.println("y: " + Mouse.getY());
+					//System.out.println("start: "+mouseStartAngle);
+					//System.out.println("stop : "+mouseEndAngle);
+
+					mouseDownRight_ = false;
+					rotation_ += drot;
+
+				}
+			}
+			else {
+				mouseDownRight_ = false;
+			}
+			
 			Vec2 vector = new Vec2((float)(gravity_*Math.sin(-rotation_/(180/3.14f))), (float)(-gravity_*Math.cos(-rotation_/(180/3.14f))));        
 			physics_.world_.setGravity(vector);
 			graphics_.globalRot_ = rotation_;
