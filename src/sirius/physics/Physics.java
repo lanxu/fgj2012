@@ -26,6 +26,7 @@ public class Physics {
 	private boolean doSleep_;
 	private Graphics graphics_;
 	public World world_;
+	private Material mat;
 	private Vector<PhysicsEntity> entities_;
 
 	// Liquid Physics
@@ -45,6 +46,7 @@ public class Physics {
 	
 	private ArrayList<Integer>[][] hash;
 	private int hashWidth,hashHeight;
+	public int transferredLiquid_ = 0;
 	
 	private Body[] liquid_;
 	// Functions
@@ -110,8 +112,8 @@ public class Physics {
 				float massPerParticle = totalMass / nParticles;
 							Entity entity = new Entity();
 				GraphicsEntity gEntity = new GraphicsEntity(entity);
-				gEntity.setCircle(0.2f, 1.0f, 1.0f);
-				gEntity.setMaterial(new Material(0.0f,0.0f,0.5f));
+				gEntity.setCircle(0.6f, 1.0f,1.0f);
+				gEntity.setMaterial(new Material(0.2f, 0.2f, 1.0f));
 				
 				PhysicsEntity pEntity = new PhysicsEntity(entity, this);
 				
@@ -148,7 +150,7 @@ public class Physics {
 				pEntity.body_.setMassData(md);
 				pEntity.body_.setSleepingAllowed(false);
 				liquid_[i] = pEntity.body_;
-	
+				transferredLiquid_++;
 				}
 			}
 		}
@@ -373,9 +375,8 @@ public class Physics {
 	public void init() {
 		initLiquid();
 		liquid_ = new Body[nParticles];
-			
+		transferredLiquid_ = 0;
 
-	
 	}	   
 
 	public void update() {
@@ -414,13 +415,13 @@ public class Physics {
 		float cx = x-1.5f;
 		float cy = y;
 		int row = 0;
-		Material m=new Material("resources/glow.png");
+		mat = new Material("resources/glow.png");
 		for (int i=curParticle; i < (curParticle+amount); ++i) {
 			Entity entity = new Entity();
 			GraphicsEntity gEntity = new GraphicsEntity(entity);
 			//gEntity.setCircle(0.2f, 1.0f, 1.0f);
 			gEntity.setBox(0.6f, 0.6f);
-			gEntity.setMaterial(m);
+			gEntity.setMaterial(mat);
 			
 			PhysicsEntity pEntity = new PhysicsEntity(entity, this);
 			
@@ -465,6 +466,7 @@ public class Physics {
 		entity.body_ = world_.createBody(entity.bodydef_);
 		entity.body_.createFixture(entity.fixtureDef_);
 	}
+
 	public void removeEntity(PhysicsEntity entity) {
 		Enumeration<PhysicsEntity> e = entities_.elements();
 		int index = 0;

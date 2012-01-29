@@ -80,6 +80,10 @@ public class Level1 {
 		gEntity.setBox(3.0f, 3.0f);
 		Main.graphics_.addEntity(gEntity);
 		
+		pEntity = new PhysicsEntity(entity, Main.physics_);
+		pEntity.setBox(3.0f, 3.0f, false);
+		pEntity.setType(PhysicsEntity.TYPE_SENSOR);
+		Main.physics_.addEntity(pEntity);	
 		
 	}
 	private void createBox(float sx, float sy, float length, float thickness, float angle) {
@@ -196,11 +200,11 @@ public class Level1 {
 			entity.setPosition(sx-0.0f, sy-7.0f);
 			entity.setRotation(0);
 			
-			gEntity = new GraphicsEntity(entity);
+		/*	gEntity = new GraphicsEntity(entity);
 			gEntity.setMaterial(new Material(1.0f,0.0f,0.0f));
 			gEntity.setBox(1.0f, 0.1f);
 			Main.graphics_.addEntity(gEntity);
-			
+			*/
 			pEntity = new PhysicsEntity(entity, Main.physics_);
 			pEntity.setBox(1.0f, 0.1f, false);
 			Main.physics_.addEntity(pEntity);

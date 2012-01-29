@@ -48,7 +48,6 @@ public class Main {
 	private static int mouseStartY = 0;
 	private static float mouseStartAngle = 0;
 
-
 	public static void main(String[] args) {
 		try {
 			// Init the game
@@ -174,6 +173,7 @@ public class Main {
 		physics_.world_.setGravity(vector);
 		graphics_.globalRot_ = rotation_;
 
+		graphics_.score_ = physics_.transferredLiquid_;
 		//rotation_ += 0.1f;
 
 	}

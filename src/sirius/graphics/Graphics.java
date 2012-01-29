@@ -2,6 +2,8 @@ package sirius.graphics;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import game.Main;
+
 import java.awt.Font;
 import java.io.InputStream;
 import java.util.Enumeration;
@@ -39,6 +41,7 @@ public class Graphics {
 	public float globalScale_;
 	private TrueTypeFont font_;
 	private float aspectRatio_;
+	public int score_;
 	
 	private Vector<GraphicsEntity> entities_;
 	
@@ -48,6 +51,7 @@ public class Graphics {
 		entities_ = new Vector<GraphicsEntity>();
 		globalRot_ = 30;
 		globalScale_ = 0.04f;
+		score_ = 0;
 	}
 
 	public void init() {
@@ -115,8 +119,8 @@ public class Graphics {
 	    glTranslatef(-aspectRatio_+0.05f, 1.0f, 0.0f);
 
 	    glScalef(0.004f, -0.004f, 0.004f);
-	    font_.drawString(0.0f, 0.0f, "SCORE", Color.black);
-	    font_.drawString(100.0f, 0.0f, ""+frame_, Color.red);
+	    font_.drawString(0.0f, 0.0f, "COMPLETED", Color.black);
+	    font_.drawString(150.0f, 0.0f, " "+score_+" / 300", Color.black);
 	    glColor3f(1.0f, 1.0f, 1.0f);
 	    // Return
 	    TextureImpl.unbind();
@@ -186,6 +190,9 @@ public class Graphics {
 					
 					glPushMatrix();
 				    	glTranslatef(x, y, 0.0f);
+				    	if(gEntity.getEntity().getId() == Main.ID_GOAL) {
+				    		rot = (frame_ % 360)*4;
+				    	}
 				    	glRotatef(rot, 0.0f, 0.0f, 1.0f);
 				    	
 				    	glBegin(GL_POLYGON);
@@ -202,7 +209,7 @@ public class Graphics {
 						}
 				    	glEnd();
 				    glPopMatrix();
-				}			
+				}
 				
 				
 			}
