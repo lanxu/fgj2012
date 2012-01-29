@@ -129,8 +129,8 @@ public class TextureLoader {
         tex = getTexture(resourceName,
                          GL_TEXTURE_2D, // target
                          GL_RGBA,     // dst pixel format
-                         GL_NEAREST, // min filter (unused)
-                         GL_NEAREST);
+                         GL_LINEAR, // min filter (unused)
+                         GL_LINEAR);
 
         table.put(resourceName,tex);
 

@@ -12,8 +12,10 @@ import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.opengl.TextureImpl;
 import org.newdawn.slick.util.ResourceLoader;
 
+import sirius.Entity;
 import sirius.Point;
 import sirius.Shape;
+import sirius.physics.PhysicsEntity;
 
 public class Graphics {
 	// Graphics Manager goes through a pipeline which has several steps
@@ -45,7 +47,7 @@ public class Graphics {
 		height_ = 600;
 		entities_ = new Vector<GraphicsEntity>();
 		globalRot_ = 30;
-		globalScale_ = 0.07f;
+		globalScale_ = 0.04f;
 	}
 
 	public void init() {
@@ -117,6 +119,7 @@ public class Graphics {
 	    font_.drawString(100.0f, 0.0f, ""+frame_, Color.red);
 	    glColor3f(1.0f, 1.0f, 1.0f);
 	    // Return
+	    TextureImpl.unbind();
 	    
 	    glPopMatrix();
 	    glPushMatrix();
@@ -130,15 +133,52 @@ public class Graphics {
 			GraphicsEntity gEntity = e.nextElement();
 		
 			Material m = gEntity.getMaterial();
+			Texture tex = m.getTexture();
 			
 			if(m.isSolid()) {
-				TextureImpl.bindNone();
+				
+				//TextureImpl.bindNone();
+				glDisable(GL_TEXTURE_2D);
+				glPushMatrix();
 				float r = m.getRed();
 				float g = m.getGreen();
 				float b = m.getBlue();
 				glColor3f(r,g,b);
 
 				Shape shape = gEntity.getPolygonShape();
+				if(shape.getShapeType() == Shape.POLYGON) {
+					float x = gEntity.getEntity().getX();
+					float y = gEntity.getEntity().getY();
+					float rot = gEntity.getEntity().getRotation();
+
+					glTranslatef(x, y, 0.0f);
+					glRotatef(rot, 0.0f, 0.0f, 1.0f);
+
+					glBegin(GL_POLYGON);
+					Vector<Point> points = shape.getPoints();
+					Enumeration<Point> pEnum = points.elements();
+					while(pEnum.hasMoreElements()) {
+						Point point = pEnum.nextElement();
+
+						glVertex2f(point.getX(), point.getY());
+
+					}
+					glEnd();
+
+				}
+				glColor3f(1.0f, 1.0f, 1.0f);
+				glPopMatrix();
+				//TextureImpl.unbind();
+				glEnable(GL_TEXTURE_2D);
+				
+			}
+			if(m.isTextured()) {
+				tex.bind();
+				
+				
+				
+				Shape shape = gEntity.getPolygonShape();
+				Shape texShape = gEntity.getTextureShape();
 				if(shape.getShapeType() == Shape.POLYGON) {
 					float x = gEntity.getEntity().getX();
 					float y = gEntity.getEntity().getY();
@@ -150,19 +190,20 @@ public class Graphics {
 				    	
 				    	glBegin(GL_POLYGON);
 				    	Vector<Point> points = shape.getPoints();
+				    	Vector<Point> tpoints = texShape.getPoints();
 				    	Enumeration<Point> pEnum = points.elements();
+				    	int i = 0;
 						while(pEnum.hasMoreElements()) {
 							Point point = pEnum.nextElement();
-										
+							glTexCoord2f(tpoints.get(i).getX(), tpoints.get(i).getY());
 							glVertex2f(point.getX(), point.getY());
+							i++;
 							
 						}
 				    	glEnd();
 				    glPopMatrix();
-				}
-			} else if(m.isTextured()) {
-				Texture tex = gEntity.getTexture();
-				tex.bind();
+				}			
+				
 				
 			}
 			
@@ -199,5 +240,17 @@ public class Graphics {
 		}
 		glPopMatrix();
 		frame_++;
-	}	
+	}
+	public void removeEntity(Entity entity) {
+		Enumeration<GraphicsEntity> e = entities_.elements();
+		int index = 0;
+		while(e.hasMoreElements()) {
+			GraphicsEntity pEntity = e.nextElement();
+			if(pEntity.getEntity() == entity) {
+				entities_.remove(index);
+				return;
+			}
+			index++;
+		}
+	}
 }

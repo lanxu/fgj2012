@@ -29,7 +29,8 @@ public class GraphicsEntity {
 	}
 	
 	Texture getTexture() {
-		return texture_;
+		//return texture_;
+		return material_.getTexture();
 	}
 	public void setPolygon() {
 		

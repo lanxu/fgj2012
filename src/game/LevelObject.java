@@ -8,9 +8,12 @@ public class LevelObject {
 	private Entity entity_;
 	private GraphicsEntity graphicsEntity_;
 	private PhysicsEntity physicsEntity_;
-	
 	public LevelObject(Entity entity) {
 		entity_ = entity;
+	}
+	public LevelObject(Entity entity, GraphicsEntity gentity) {
+		entity_ = entity;
+		graphicsEntity_ = gentity;
 	}
 	public void setGraphics(GraphicsEntity entity) {
 		graphicsEntity_ = entity;

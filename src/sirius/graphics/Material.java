@@ -61,6 +61,10 @@ public class Material {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		isSolid_ = false;
+		isTexture_ = true;
+		isShaders_ = false;
 	}
 	public Material(Texture tex) {
 		setTexture(tex);

@@ -27,6 +27,8 @@ import static org.lwjgl.opengl.GL11.*;
 public class Main {
 	private static final int FRAMERATE = 60;
 
+	public static int ID_GOAL = 1;
+	
 	public static Physics physics_;
 	public static Input input_;
 	public static Graphics graphics_;
@@ -38,7 +40,7 @@ public class Main {
 	private static int tile = 1;
 
 	private static int frame_ = 0;
-	private static Level level_;
+	private static Level1 level_;
 	private static float gravity_ = 10.0f;
 	private static float rotation_ = 0;
 	private static boolean mouseDown_ = false;
@@ -78,7 +80,8 @@ public class Main {
 		// Init managers
 		graphics_.init();
 		physics_.init();
-		level_ = new Level();
+		level_ = new Level1();
+		
 	}
 
 	private static void render() {
@@ -108,14 +111,14 @@ public class Main {
 			}
 		}
 
-		return angle;
+		return 2.0f * angle;
 	}
 
 	private static float getAngleSlider(float x, float x_max) {
 		float dx = Mouse.getX() - x_max;
 		float angle;
 
-		angle = (dx / 400) * 2.0f * 3.14159f;
+		angle = (dx / 400) * 1.0f * 3.14159f;
 
 		return angle;
 	}

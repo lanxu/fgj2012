@@ -26,14 +26,24 @@ public class PhysicsEntity {
 	
 	private int type_;
 	
+	public boolean colliding_;
+	public boolean setToDie_;
+	public int contactId_;
+	
 	public static int TYPE_STATIC = 0;
 	public static int TYPE_DYNAMIC = 1;
 	public static int TYPE_FLUID = 2;
+	public static int TYPE_SENSOR = 3;
 	
 	public PhysicsEntity(Entity entity, Physics physics) {
 		entity_ = entity;
 		physics_ = physics;
 		bodydef_ = new BodyDef();
+		bodydef_.userData = this;
+		colliding_ = false;
+		setToDie_ = false;
+		contactId_ = 0;
+		
 		
 	}
 	
@@ -55,6 +65,8 @@ public class PhysicsEntity {
 		}
 		polShape_ = new PolygonShape();
 		polShape_.set(vertices, vertices.length);
+		bodydef_.position.set(entity_.getX(), entity_.getY());
+		bodydef_.angle = entity_.getRotation()/(180/3.14f);
 		fixtureDef_ = new FixtureDef();
 		fixtureDef_.shape = polShape_;
 		fixtureDef_.density = 1.0f;
@@ -63,8 +75,10 @@ public class PhysicsEntity {
 	}
 	public void setCircle(float radius) {
 		circleShape_ = new CircleShape();
-		circleShape_.m_p.set(entity_.getX(), entity_.getY());
+		//circleShape_.m_p.set(entity_.getX(), entity_.getY());
 		circleShape_.m_radius = radius;
+		bodydef_.position.set(entity_.getX(), entity_.getY());
+		bodydef_.angle = entity_.getRotation()/(180/3.14f);
 		fixtureDef_ = new FixtureDef();
 		fixtureDef_.shape =circleShape_;
 		fixtureDef_.density = 1.0f;
@@ -109,6 +123,8 @@ public class PhysicsEntity {
 		type_ = type;
 		if(type_ == TYPE_STATIC) {
 			bodydef_.type = BodyType.STATIC;
+		} else if(type_ == TYPE_SENSOR) {
+			fixtureDef_.isSensor = true;
 		} else {
 			bodydef_.type = BodyType.DYNAMIC;
 		}

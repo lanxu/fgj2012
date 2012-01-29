@@ -4,12 +4,15 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.*;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
+import org.jbox2d.dynamics.contacts.Contact;
 
 import sirius.Entity;
 import sirius.Shape;
@@ -27,16 +30,16 @@ public class Physics {
 
 	// Liquid Physics
 	private int nParticles = 500;
+	private int curParticle = 0;
 	private float totalMass = 10.0f;
-	private float boxWidth = 2.0f;
-	private float boxHeight = 10.0f;
+	private float boxWidth = 4.0f;
+	private float boxHeight = 20.0f;
 	
 	private float fluidMinX = -20.0f;
 	private float fluidMaxX = 20.0f;
-	private float fluidMinY = -30.0f;
-	private float fluidMaxY = 10.0f;
+	private float fluidMinY = -25.0f;
+	private float fluidMaxY = 25.0f;
 
-	
 	private float rad = 0.6f;
 	private float visc = 0.006f;//0.005f;
 	
@@ -44,8 +47,6 @@ public class Physics {
 	private int hashWidth,hashHeight;
 	
 	private Body[] liquid_;
-	private Body bod;
-	
 	// Functions
 	private int hashX(float x) {
 		float f = MathUtils.map(x, fluidMinX, fluidMaxX, 0, hashWidth-.001f);
@@ -64,8 +65,8 @@ public class Physics {
 	    		hash[i][j] = new ArrayList<Integer>();
 	    	}
 	    }
-	    hashWidth = 40;
-	    hashHeight = 40;
+	    hashWidth = 80;
+	    hashHeight = 80;
 	}
 	private void hashLocations() {
 		for(int a = 0; a < hashWidth; a++)
@@ -75,50 +76,81 @@ public class Physics {
             }
         }
 
-        for(int a = 0; a < liquid_.length; a++)
+        for(int a = 0; a < curParticle; a++)
         {
+			if(liquid_[a].m_userData != null)
+			{
             int hcell = hashX(liquid_[a].m_sweep.c.x);
             int vcell = hashY(liquid_[a].m_sweep.c.y);
             if(hcell > -1 && hcell < hashWidth && vcell > -1 && vcell < hashHeight)
                 hash[hcell][vcell].add(new Integer(a));
+			}
         }
 	}
 	private void dampenLiquid() {
-		for (int i=0; i<liquid_.length; ++i) {
+		for (int i=0; i< curParticle; ++i) {
+			if(liquid_[i].m_userData != null)
+			{
 			Body b = liquid_[i];
 			b.setLinearVelocity(b.getLinearVelocity().mul(0.99f));
+			}
 		}
 	}
 	private void checkBounds() {
-		for (int i=0; i<liquid_.length; ++i) {
-			//if (liquid_[i].getWorldCenter().y < -10.0f) {
-				//world_.destroyBody(liquid_[i]);
+		for (int i=0; i<curParticle; ++i) {
+			//if (liquid_[i].getWorldCenter().y < -5.0f) {
+			if(liquid_[i].getUserData() != null) {
+			if(((PhysicsEntity)liquid_[i].getUserData()).setToDie_ == true)
+			{
+				world_.destroyBody(liquid_[i]);
+				removeEntity(((PhysicsEntity)liquid_[i].getUserData()));
+				graphics_.removeEntity(((PhysicsEntity)liquid_[i].getUserData()).getEntity());
 				
-				/*float massPerParticle = totalMass / nParticles;
+				
+				float massPerParticle = totalMass / nParticles;
+							Entity entity = new Entity();
+				GraphicsEntity gEntity = new GraphicsEntity(entity);
+				gEntity.setCircle(0.2f, 1.0f, 1.0f);
+				gEntity.setMaterial(new Material(0.0f,0.0f,0.5f));
+				
+				PhysicsEntity pEntity = new PhysicsEntity(entity, this);
 				
 				CircleShape pd = new CircleShape();
-				FixtureDef fd = new FixtureDef();
-				fd.shape = pd;
-				fd.density = 1.0f;
-				fd.filter.groupIndex = -10;
-				pd.m_radius = .05f;
-				fd.restitution = 0.4f;
-				fd.friction = 0.0f;
-				float cx = 0.0f + MathUtils.randomFloat(-0.6f,0.6f);
-				float cy = 15.0f + MathUtils.randomFloat(-2.3f,2.0f);
-				BodyDef bd = new BodyDef();
-				bd.position = new Vec2( cx, cy );
-				bd.fixedRotation = true;
+				pd.m_radius = 0.04f;
+				pEntity.fixtureDef_ = new FixtureDef();
+				pEntity.fixtureDef_.shape = pd;
+				pEntity.fixtureDef_.density = 1f;
+				pEntity.fixtureDef_.filter.groupIndex = -10;	
+				pEntity.fixtureDef_.restitution = 0.4f;
+				pEntity.fixtureDef_.friction = 0.0f;
+				//BodyDef bd = new BodyDef();
+				BodyDef bd = pEntity.bodydef_;
+				float cx = 0.0f;
+				float cy = 0.0f;
+				bd.position = new Vec2( MathUtils.randomFloat(cx-0.5f ,cx+0.5f),
+						MathUtils.randomFloat(cy-0.5f,cy+0.5f));
+				
+				//bd.position = new Vec2(i*)
+				
+				//bd.fixedRotation = true;
 				bd.type = BodyType.DYNAMIC;
-				Body b = world_.createBody(bd);
-				b.createFixture(fd).setUserData(666);
+				
+				addEntity(pEntity);
+				graphics_.addEntity(gEntity);
+				pEntity.contactId_ = 666;
+				pEntity.body_.setUserData(pEntity);
+				
+				//b.createFixture(fd).setUserData(666);
+				
 				MassData md = new MassData();
 				md.mass = massPerParticle;
 				md.I = 1.0f;
-				b.setMassData(md);
-				b.setSleepingAllowed(false);
-				liquid_[i] = b;*/
-			//}
+				pEntity.body_.setMassData(md);
+				pEntity.body_.setSleepingAllowed(false);
+				liquid_[i] = pEntity.body_;
+	
+				}
+			}
 		}
 		/*
 		if (bod.getWorldCenter().y < -15.0f) {
@@ -151,14 +183,17 @@ public class Physics {
 		float[] ys = new float[liquid_.length];
 		float[] vxs = new float[liquid_.length];
 		float[] vys = new float[liquid_.length];
-		for (int i=0; i<liquid_.length; ++i) {
+		for (int i=0; i < curParticle; ++i) {
+			if(liquid_[i].m_userData != null)
+			{
 			xs[i] = multiplier*liquid_[i].m_sweep.c.x;
 			ys[i] = multiplier*liquid_[i].m_sweep.c.y;
 			vxs[i] = multiplier*liquid_[i].m_linearVelocity.x;
 			vys[i] = multiplier*liquid_[i].m_linearVelocity.y;
+			}
 		}
 		
-		for(int i = 0; i < liquid_.length; i++) {
+		for(int i = 0; i < curParticle; i++) {
 			// Populate the neighbor list from the 9 proximate cells
 			ArrayList<Integer> neighbors = new ArrayList<Integer>();
 	        int hcell = hashX(liquid_[i].m_sweep.c.x);
@@ -245,11 +280,14 @@ public class Physics {
 	        ychange[i] += changey;
         }
 		//multiplier *= deltaT;
-		for (int i=0; i<liquid_.length; ++i) {
+		for (int i=0; i< curParticle; ++i) {
+			if(liquid_[i].m_userData != null)
+			{
 			liquid_[i].m_xf.position.x += xchange[i] / multiplier;
 			liquid_[i].m_xf.position.y += ychange[i] / multiplier;
 			liquid_[i].m_linearVelocity.x += xchange[i] / (multiplier*deltaT);
 			liquid_[i].m_linearVelocity.y += ychange[i] / (multiplier*deltaT);
+			}
 		}
 		
 	}
@@ -264,75 +302,79 @@ public class Physics {
 		world_ = new World(gravity_, doSleep_);
 		world_.setContinuousPhysics(true);
 		world_.setWarmStarting(true);
+		world_.setContactListener(new ContactListener() {
+
+			@Override
+			public void beginContact(Contact contact) {
+				Fixture fixtureA = contact.getFixtureA();
+				Fixture fixtureB = contact.getFixtureB();
+				Object objA = fixtureA.getBody().getUserData();
+				Object objB = fixtureB.getBody().getUserData();
+				if(objA != null) {
+					if(((PhysicsEntity)objA).getType() == PhysicsEntity.TYPE_SENSOR)
+					{
+						if(((PhysicsEntity)objB).contactId_ == 666) {
+							((PhysicsEntity)objB).colliding_ = true;
+						}
+					}
+				}
+				if(objB != null) {
+					if(((PhysicsEntity)objB).getType() == PhysicsEntity.TYPE_SENSOR)
+					{
+						if(((PhysicsEntity)objA).contactId_ == 666) {
+							((PhysicsEntity)objA).colliding_ = true;
+						}
+					}
+				}
+			}
+
+			@Override
+			public void endContact(Contact contact) {
+				Fixture fixtureA = contact.getFixtureA();
+				Fixture fixtureB = contact.getFixtureB();
+				Object objA = fixtureA.getBody().getUserData();
+				Object objB = fixtureB.getBody().getUserData();
+				if(objA != null) {
+					if(((PhysicsEntity)objA).getType() == PhysicsEntity.TYPE_SENSOR)
+					{
+						
+						if(((PhysicsEntity)objB).contactId_ == 666) {
+							((PhysicsEntity)objB).colliding_ = false;
+						}
+					}
+					if(((PhysicsEntity)objB).getType() == PhysicsEntity.TYPE_SENSOR)
+					{
+						if(((PhysicsEntity)objA).contactId_ == 666) {
+							((PhysicsEntity)objA).colliding_ = false;
+						}
+					///	((PhysicsEntity)objB).colliding_ = false;
+					}
+				}
+				
+			}
+
+			@Override
+			public void postSolve(Contact arg0, ContactImpulse arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void preSolve(Contact arg0, Manifold arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+		    
+		});
+
 		entities_ = new Vector<PhysicsEntity>();
 		graphics_ = g;
 	}
 	public void init() {
 		initLiquid();
-		
 		liquid_ = new Body[nParticles];
-		float massPerParticle = totalMass / nParticles;
-//		PointDef pd = new PointDef();
-//		pd.mass = massPerParticle;
-//		pd.restitution = 0.0f;
-//		pd.filter.groupIndex = -10;
+			
 
-		
-		
-		
-		/*
-		CircleShape pd = new CircleShape();
-		FixtureDef fd = new FixtureDef();
-		fd.shape = pd;
-		fd.density = 1f;
-		fd.filter.groupIndex = -10;
-		pd.m_radius = .05f;
-		fd.restitution = 0.4f;
-		fd.friction = 0.0f;
-		*/
-		float cx = 0.0f;
-		float cy = 20.0f;
-		int row = 0;
-		for (int i=0; i<nParticles; ++i) {
-			Entity entity = new Entity();
-			GraphicsEntity gEntity = new GraphicsEntity(entity);
-			gEntity.setCircle(0.2f, 1.0f, 1.0f);
-			gEntity.setMaterial(new Material(0.0f,0.0f,0.5f));
-			
-			PhysicsEntity pEntity = new PhysicsEntity(entity, this);
-			
-			CircleShape pd = new CircleShape();
-			pd.m_radius = 0.04f;
-			pEntity.fixtureDef_ = new FixtureDef();
-			pEntity.fixtureDef_.shape = pd;
-			pEntity.fixtureDef_.density = 1f;
-			pEntity.fixtureDef_.filter.groupIndex = -10;	
-			pEntity.fixtureDef_.restitution = 0.4f;
-			pEntity.fixtureDef_.friction = 0.0f;
-			//BodyDef bd = new BodyDef();
-			BodyDef bd = pEntity.bodydef_;
-			
-			bd.position = new Vec2( MathUtils.randomFloat(cx-boxWidth ,cx+boxWidth),
-					MathUtils.randomFloat(cy-boxHeight,cy+boxHeight));
-			
-			//bd.position = new Vec2(i*)
-			
-			//bd.fixedRotation = true;
-			bd.type = BodyType.DYNAMIC;
-			
-			addEntity(pEntity);
-			graphics_.addEntity(gEntity);
-			pEntity.body_.setUserData(666);
-			
-			//b.createFixture(fd).setUserData(666);
-			
-			MassData md = new MassData();
-			md.mass = massPerParticle;
-			md.I = 1.0f;
-			pEntity.body_.setMassData(md);
-			pEntity.body_.setSleepingAllowed(false);
-			liquid_[i] = pEntity.body_;
-		}
 	
 	}	   
 
@@ -348,6 +390,12 @@ public class Physics {
 		while(e.hasMoreElements()) {
 			PhysicsEntity pEntity = e.nextElement();
 			pEntity.update();
+			
+			if(pEntity.colliding_)
+			{
+				//System.out.println("f");
+				removeEntity(pEntity);
+			}
 			/*pEntity.getEntity().setPosition(pEntity.getBody().getPosition().x, 
 					                        pEntity.getBody().getPosition().y);*/
 		}
@@ -359,14 +407,75 @@ public class Physics {
 		//}
 		dampenLiquid();
 		
-		//checkBounds();
+		checkBounds();
 	}
 	public void addLiquid(float x, float y, int amount) {
-		
+		float massPerParticle = totalMass / nParticles;	
+		float cx = x-1.5f;
+		float cy = y;
+		int row = 0;
+		Material m=new Material("resources/glow.png");
+		for (int i=curParticle; i < (curParticle+amount); ++i) {
+			Entity entity = new Entity();
+			GraphicsEntity gEntity = new GraphicsEntity(entity);
+			//gEntity.setCircle(0.2f, 1.0f, 1.0f);
+			gEntity.setBox(0.6f, 0.6f);
+			gEntity.setMaterial(m);
+			
+			PhysicsEntity pEntity = new PhysicsEntity(entity, this);
+			
+			CircleShape pd = new CircleShape();
+			pd.m_radius = 0.04f;
+			pEntity.fixtureDef_ = new FixtureDef();
+			pEntity.fixtureDef_.shape = pd;
+			pEntity.fixtureDef_.density = 1f;
+			pEntity.fixtureDef_.filter.groupIndex = -10;	
+			pEntity.fixtureDef_.restitution = 0.4f;
+			pEntity.fixtureDef_.friction = 0.0f;
+			//BodyDef bd = new BodyDef();
+			BodyDef bd = pEntity.bodydef_;
+			
+			int dy = (int) Math.floor(((float)i / 15.0f));
+			int dx = i % 15;
+			bd.position = new Vec2(cx+dx*0.2f, cy+dy*0.2f);
+			
+			//bd.position = new Vec2(i*)
+			
+			//bd.fixedRotation = true;
+			bd.type = BodyType.DYNAMIC;
+			
+			addEntity(pEntity);
+			graphics_.addEntity(gEntity);
+			pEntity.contactId_ = 666;
+			pEntity.body_.setUserData(pEntity);
+			
+			//b.createFixture(fd).setUserData(666);
+			
+			MassData md = new MassData();
+			md.mass = massPerParticle;
+			md.I = 1.0f;
+			pEntity.body_.setMassData(md);
+			pEntity.body_.setSleepingAllowed(false);
+			liquid_[i] = pEntity.body_;
+		}
+		curParticle += amount;
 	}
 	public void addEntity(PhysicsEntity entity) {
 		entities_.add(entity);
 		entity.body_ = world_.createBody(entity.bodydef_);
 		entity.body_.createFixture(entity.fixtureDef_);
+	}
+	public void removeEntity(PhysicsEntity entity) {
+		Enumeration<PhysicsEntity> e = entities_.elements();
+		int index = 0;
+		while(e.hasMoreElements()) {
+			PhysicsEntity pEntity = e.nextElement();
+			if(pEntity.equals(entity)) {
+				pEntity.setToDie_ = true;
+
+				return;
+			}
+			index++;
+		}
 	}
 }

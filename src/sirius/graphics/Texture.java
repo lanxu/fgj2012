@@ -83,7 +83,10 @@ public class Texture {
 		this.target = target;
 		this.textureID = textureID;
 	}
-
+	/*
+	public void unbind() {
+		glBindTexture
+	}*/
 	/**
 	 * Bind the specified GL context to a texture
 	 */
